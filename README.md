@@ -23,3 +23,20 @@ This guide provides instructions for setting up a Python development environment
    Open a terminal (Command Prompt on Windows, Terminal on macOS/Linux) and run:
    ```bash
    python --version
+
+## Setup Environment
+
+   Open a terminal (Command Prompt on Windows, Terminal on macOS/Linux) and run:
+   ```bash
+   mkdir proyek_analisis_data
+   cd proyek_analisis_data
+   pipenv install
+   pipenv shell
+   pip install -r requirements.txt
+   ```
+
+## Run Streamlit App
+
+   ```bash
+   streamlit run main_dashboard.py
+   ```
