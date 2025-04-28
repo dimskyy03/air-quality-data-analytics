@@ -115,7 +115,6 @@ if selected_display == "Yearly":
 
 # Displaying the mean values of pollutants based on hourly data
 hourly_pollutants = df.groupby('hour')[['PM2.5', 'PM10', 'SO2', 'NO2', 'CO', 'O3']].mean().reset_index()
-st.subheader(f"Average Air Quality Data Each Hour") 
 
 # Define pollutant quality thresholds
 
@@ -183,9 +182,10 @@ def airpolution_display(df):
         with col6:
             st.metric("O3: ", value = df['O3'], delta_color="normal")
 
-for hour in range(24):
-    with st.expander(f"Air Quality Data at {hourly_pollutants['hour'].iloc[hour]}:00"):
-        airpolution_display(pollutant_quality_df.iloc[hour])
+#side bar for choose the hour to display the air quality data
+selected_hour = st.sidebar.selectbox("Select hour to display air quality data", df['hour'].unique(), index=0)
+st.subheader(f"Average Air Quality at {hourly_pollutants['hour'].iloc[selected_hour]}:00") 
+airpolution_display(pollutant_quality_df.iloc[selected_hour])
 
 #########################################################################
 
@@ -193,25 +193,20 @@ for hour in range(24):
 correlation_matrix_all = df[['PM2.5', 'PM10', 'SO2', 'NO2', 'CO', 'O3', 'TEMP', 'PRES', 'RAIN']].corr()
 polutant_correlation = correlation_matrix_all.iloc[:6, 6:]
 st.subheader("Correlation Matrix of Pollutants")
-fig, ax = plt.subplots()  # buat Figure dan Axes
+fig, ax = plt.subplots()  # for Figure dan Axes
 sns.heatmap(polutant_correlation, annot=True, cmap='coolwarm', fmt=".2f", cbar=True, square=True, ax=ax)
-st.pyplot(fig)  # tampilkan figure, bukan axes
+st.pyplot(fig)  # display figure, not axes
 
 ###########################################################################
 
-# side bar for wind speed in selected hour
-st.sidebar.header("Wind Speed")
-selected_hour = st.sidebar.selectbox("Select hour", df['hour'].unique(), index=0)
+# lineplot for hourly wind speed
+
+wind_speed = df.groupby('hour')['WSPM'].mean()
+st.subheader("Hourly Wind Speed")
+st.line_chart(wind_speed, x_label="Hour", y_label="Wind Speed (m/s)")
+
+# choose the hour to display the wind speed
+selected_hour = st.sidebar.selectbox("Select hour to display wind speed", df['hour'].unique(), index=0)
+
 selected_wind_speed = str(round(df[df['hour'] == selected_hour]['WSPM'].mean(),3)) + " m/s"
-
-st.subheader("Average Wind Speed at Selected Hour")
-# Display the lineplot average wind speed at the selected hour
-fig, ax = plt.subplots(figsize=(12, 6))
-sns.lineplot(data=df[df['hour'] == selected_hour], x='Date', y='WSPM', ax=ax, label='Wind Speed', markers=True, dashes=True)
-ax.set_title(f"Average Wind Speed per Day")
-ax.set_xlabel("Date")
-ax.set_ylabel("Wind Speed (m/s)")
-st.pyplot(fig)
-
-
-st.metric(f"Wind Speed at 0{selected_hour}:00: ", value=selected_wind_speed, delta_color="normal")
+st.metric(f"Wind Speed at {selected_hour}:00: ", value=selected_wind_speed, delta_color="normal")
